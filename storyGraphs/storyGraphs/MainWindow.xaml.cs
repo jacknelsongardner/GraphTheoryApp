@@ -28,33 +28,43 @@ namespace storyGraphs
         Brush StandardBrush;
         Random r = new Random();
 
+        //for incrementing the ID we give in the dictionary
+        int nextRectangleId = 0;
+        //dictionary for storing all the rectangles, so they can be called and deleted later on
+        Dictionary<Rectangle,Node> rectanglesOnCanvas = new Dictionary<Rectangle,Node>();
+        Dictionary<Line, Edge> linesOnCanvas = new Dictionary<Line, Edge>();
+        
+        LinkedList<Node> nodesOnCanvas = new LinkedList<Node>();
+        LinkedList<Edge> edgesOnCanvas = new LinkedList<Edge>();
+        
+
         //when the user clicks with the left mousebutton on the Graph/Node canvas
         private void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             
-                // this is the event that will check if we clicked on a rectangle or if we clicked on the canvas
-                // if we clicked on a rectangle then it will do the following
-
+                // If we're clicking on a rectangle
                 if (e.OriginalSource is Rectangle)
                 {
-                    // if the click source is a rectangle then we will create a new rectangle
-                    // and link it to the rectangle that sent the click event
-                    Rectangle activeRec = (Rectangle)e.OriginalSource; // create the link between the sender rectangle
-
+                    //deleting the rectangle
+                    Rectangle activeRec = (Rectangle)e.OriginalSource;
                     NodesEdgesCanvas.Children.Remove(activeRec); // find the rectangle and remove it from the canvas
+                    rectanglesOnCanvas.Remove(activeRec);
+                    
+                
+                    Console.WriteLine();
+                    
+
+
                 }
 
-                // if we clicked on the canvas then we do the following
+                // If we clicked on the canvas 
                 else
                 {
-                    // generate a random colour and save it inside the custom brush variable
+                    
                     StandardBrush = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255),
                     (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
 
-                    // create a re rectangle and give it the following properties
-                    // height and width 50 pixels
-                    // border thickness 3 pixels, fill colour set to the custom brush created above
-                    // border colour set to black
+                    //creating new rectangle
                     Rectangle newRec = new Rectangle
                     {
                         Width = 50,
@@ -64,14 +74,22 @@ namespace storyGraphs
                         Stroke = Brushes.Black
                     };
 
-                    // once the rectangle is set we need to give a X and Y position for the new object
-                    // we will calculate the mouse click location and add it there
+                    rectanglesOnCanvas.Add(newRec,new Node());
+                    nextRectangleId++;
+                    
+
+
+
+                    //getting mouse x and y for rectangle placement
                     Canvas.SetLeft(newRec, Mouse.GetPosition(NodesEdgesCanvas).X); // set the left position of rectangle to mouse X
                     Canvas.SetTop(newRec, Mouse.GetPosition(NodesEdgesCanvas).Y); // set the top position of rectangle to mouse Y
 
                     NodesEdgesCanvas.Children.Add(newRec); // add the new rectangle to the canvas
-                }
-            
+
+                    Console.WriteLine();
+
+            }
+
         }
 
 
@@ -81,12 +99,18 @@ namespace storyGraphs
 
     }
 
-    public class Node 
-    { 
+    public class Node
+    {
+        int nodeDegree;
         
+
+
     }
 
-
+    public class Edge
+    {
+        int edgeDegree;
+    }
 
 
 }

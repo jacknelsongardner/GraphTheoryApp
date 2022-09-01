@@ -14,7 +14,7 @@
             <RichTextBox Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="452" />
             
         </Grid>
-        <Canvas Name="NodesEdgesCanvas" Focusable="True" MouseLeftButtonDown="MouseLeftButtonDown" Background="Gray" Margin="0,0,227,0.5">
+        <Canvas Name="NodesEdgesCanvas" Focusable="True" MouseRightButtonDown="MouseLeftButtonDown" Background="Gray" Margin="0,0,227,0.5">
 
         </Canvas>
     </Grid>
