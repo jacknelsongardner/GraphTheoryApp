@@ -5,8 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:storyGraphs"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="800">
+        Title="MainWindow" Height="500" Width="800" FocusManager.FocusedElement="{Binding ElementName=NodesEdgesCanvas}">
     <Grid>
+
         
+        <GridSplitter Height="469" Canvas.Left="568" Canvas.Top="2" Width="5"/>
+        <Grid HorizontalAlignment="Right" Height="472" Margin="573,0,0,0" Width="222">
+            <RichTextBox Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="452" />
+            
+        </Grid>
+        <Canvas Name="NodesEdgesCanvas" Focusable="True" MouseLeftButtonDown="MouseLeftButtonDown" Background="Gray" Margin="0,0,227,0.5">
+
+        </Canvas>
     </Grid>
+
+
 </Window>

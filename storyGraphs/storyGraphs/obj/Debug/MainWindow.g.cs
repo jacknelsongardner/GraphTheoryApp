@@ -41,7 +41,7 @@ namespace storyGraphs {
     public partial class MainWindow : System.Windows.Window, System.Windows.Markup.IComponentConnector {
         
         
-        #line 17 "..\..\MainWindow.xaml"
+        #line 11 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Canvas NodesEdgesCanvas;
         
@@ -81,7 +81,7 @@ namespace storyGraphs {
             case 1:
             this.NodesEdgesCanvas = ((System.Windows.Controls.Canvas)(target));
             
-            #line 17 "..\..\MainWindow.xaml"
+            #line 11 "..\..\MainWindow.xaml"
             this.NodesEdgesCanvas.MouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(this.MouseLeftButtonDown);
             
             #line default
