@@ -13,7 +13,7 @@ namespace storyGraphs
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+
 
         //whether the mouse is being dragged
         bool mouseDragging;
@@ -28,11 +28,11 @@ namespace storyGraphs
 
         //variables for storing selected rectangle, node, etc
         Node selectedNode = new Node();
-        
+
         Edge selectedEdge = new Edge();
 
         Rectangle selectedRectangle = new Rectangle();
-        
+
         Line selectedLine = new Line();
 
         LinkedList<Node> nodeHistory = new LinkedList<Node>();
@@ -59,7 +59,7 @@ namespace storyGraphs
 
 
         //dictionary for storing all the rectangles, so they can be called and deleted later on
-        Dictionary<Rectangle,Node> rectanglesOnCanvas = new Dictionary<Rectangle,Node>();
+        Dictionary<Rectangle, Node> rectanglesOnCanvas = new Dictionary<Rectangle, Node>();
         Dictionary<Line, Edge> linesOnCanvas = new Dictionary<Line, Edge>();
 
 
@@ -142,7 +142,7 @@ namespace storyGraphs
                         selectedNodeToConnectTwo = rectanglesOnCanvas[activeRec];
                         selectedRectangleToConnectTwo = activeRec;
 
-                        
+
 
                         //make a line connecting the two
                         Line activeLine = new Line();
@@ -157,11 +157,11 @@ namespace storyGraphs
                         //setting stroke of the line
                         SolidColorBrush lineBrush = new SolidColorBrush();
                         lineBrush.Color = Colors.Red;
-                        
+
 
                         activeLine.StrokeThickness = 4;
                         activeLine.Stroke = lineBrush;
-                        
+
 
                         //making new edge and putting it in the dictionary
                         linesOnCanvas.Add(activeLine, new Edge(selectedNodeToConnectOne, selectedNodeToConnectTwo));
@@ -231,7 +231,7 @@ namespace storyGraphs
             // If we're clicking on a rectangle
             if (e.OriginalSource is Rectangle)
             {
-                
+
                 //releasing the krakken!...er, the rectangle
                 Rectangle activeRec = (Rectangle)e.OriginalSource;
                 mouseDragging = false;
@@ -248,9 +248,10 @@ namespace storyGraphs
             //if we're moving a rectangle
             if (e.OriginalSource is Rectangle)
             {
-               
+
                 //if the mouse has a rectangle in its grasp
                 if (!mouseDragging) return;
+                else
                 {
                     //the rectangle we're dealing with
                     Rectangle activeRec = (Rectangle)e.OriginalSource;
@@ -264,6 +265,7 @@ namespace storyGraphs
                     Canvas.SetLeft(activeRec, left);
                     Canvas.SetTop(activeRec, top);
 
+                    
                 }
             }
         }
@@ -283,6 +285,8 @@ namespace storyGraphs
             nodeMode = true;
             edgeMode = false;
         }
+
+
     }
 
 
@@ -293,11 +297,22 @@ namespace storyGraphs
     public class Node
     {
         //how many edges are connected to the node
-        int nodeDegree;
+        private int nodeDegree;
 
         //. Could be used as a label.
-        string content;
+        private string content;
 
+        private Dictionary<Line, Edge> edgesDictionary = new Dictionary<Line, Edge>();
+
+        public Node()
+        { 
+            //do nothing for now :/
+        }
+
+        public void addEdge(Line l,Edge e)
+        {
+            edgesDictionary.Add(l, e);
+        }
 
 
 
