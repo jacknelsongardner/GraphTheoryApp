@@ -164,7 +164,7 @@ namespace storyGraphs
 
 
                         //making new edge and putting it in the dictionary
-                        linesOnCanvas.Add(activeLine, new Edge(selectedNodeToConnectOne, selectedNodeToConnectTwo));
+                        linesOnCanvas.Add(activeLine, new Edge(selectedNodeToConnectOne, selectedNodeToConnectTwo, selectedRectangleToConnectOne, selectedRectangleToConnectTwo));
                         NodesEdgesCanvas.Children.Add(activeLine);
 
                         //adding the edge/line to the selected nodes
@@ -273,7 +273,14 @@ namespace storyGraphs
 
 
                     //updating the location of the edges/lines
+                    foreach (KeyValuePair<Line, Edge> entry in linesOnCanvas)
+                    {
+                        entry.Key.X1 = Canvas.GetLeft(entry.Value.rect1);
+                        entry.Key.X2 = Canvas.GetLeft(entry.Value.rect2);
+                        entry.Key.Y1 = Canvas.GetTop(entry.Value.rect1);
+                        entry.Key.Y2 = Canvas.GetTop(entry.Value.rect2);
 
+                    }
 
                     
                 }
@@ -333,8 +340,11 @@ namespace storyGraphs
     {
 
         //the nodes that this line connects
-        Node node1;
-        Node node2;
+        public Node node1;
+        public Node node2;
+
+        public Rectangle rect1;
+        public Rectangle rect2;
 
         //CONSTRUCTORS
         public Edge()
@@ -342,11 +352,16 @@ namespace storyGraphs
 
         }
 
-        public Edge(Node n1, Node n2)
+        public Edge(Node n1, Node n2, Rectangle r1, Rectangle r2)
         {
             node1 = n1;
             node2 = n2;
+            rect1 = r1;
+            rect2 = r2;
+
         }
+
+
     }
 
 
