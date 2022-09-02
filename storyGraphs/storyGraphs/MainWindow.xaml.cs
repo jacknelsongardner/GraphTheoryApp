@@ -20,10 +20,7 @@ namespace storyGraphs
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        
 
         //whether the mouse is being dragged
         bool mouseDragging;
@@ -38,9 +35,29 @@ namespace storyGraphs
 
         //variables for storing selected rectangle, node, etc
         Node selectedNode = new Node();
+        
         Edge selectedEdge = new Edge();
+
         Rectangle selectedRectangle = new Rectangle();
+        
         Line selectedLine = new Line();
+
+        LinkedList<Node> nodeHistory = new LinkedList<Node>();
+        LinkedList<Rectangle> rectangleHistory = new LinkedList<Rectangle>();
+
+
+        //nodes and rectangles that are selected to be connected
+        Node selectedNodeToConnectOne = new Node();
+        Node selectedNodeToConnectTwo = new Node();
+
+        Rectangle selectedRectangleToConnectOne = new Rectangle();
+        Rectangle selectedRectangleToConnectTwo = new Rectangle();
+
+        //how many times the user has clicked on nodes to connect them
+        int clickCounter = 0;
+
+
+
 
         //for incrementing the ID we give in the dictionary
         //int nextRectangleId = 0;
@@ -52,10 +69,15 @@ namespace storyGraphs
         Dictionary<Rectangle,Node> rectanglesOnCanvas = new Dictionary<Rectangle,Node>();
         Dictionary<Line, Edge> linesOnCanvas = new Dictionary<Line, Edge>();
 
-        
 
 
 
+        public MainWindow()
+        {
+            InitializeComponent();
+            nodeMode = true;
+            edgeMode = false;
+        }
 
 
 
@@ -64,7 +86,7 @@ namespace storyGraphs
         //when the user clicks with the RIGHT mousebutton on the Graph/Node canvas
         private void MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (nodeMode == true)
+            if (nodeMode == true && edgeMode == false)
             {
                 // If we're clicking on a rectangle
                 if (e.OriginalSource is Rectangle)
@@ -77,10 +99,10 @@ namespace storyGraphs
 
 
                 }
-
-                // If we clicked on the canvas 
+                // Else if we clicked on the canvas 
                 else
                 {
+                    //creating the new rectangle
 
                     StandardBrush = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255),
                     (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
@@ -103,6 +125,55 @@ namespace storyGraphs
                     Canvas.SetTop(newRec, Mouse.GetPosition(NodesEdgesCanvas).Y); // set the top position of rectangle to mouse Y
 
                     NodesEdgesCanvas.Children.Add(newRec); // add the new rectangle to the canvas
+
+                }
+            }
+            
+            else if (nodeMode == false && edgeMode == true)
+            {
+                if (e.OriginalSource is Rectangle)
+                {
+                    Rectangle activeRec = (Rectangle)e.OriginalSource;
+
+                    if (clickCounter == 0)
+                    {
+                        //setting the first node to connect
+                        selectedNodeToConnectOne = rectanglesOnCanvas[activeRec];
+                        selectedRectangleToConnectOne = activeRec;
+
+                        //adding one to click counter
+                        clickCounter++;
+
+                    }
+                    else if (clickCounter >= 1)
+                    {
+                        //setting the first node to connect
+                        selectedNodeToConnectTwo = rectanglesOnCanvas[activeRec];
+                        selectedRectangleToConnectTwo = activeRec;
+
+                        //reset the counter
+                        clickCounter = 0;
+
+                        //make a line connecting the two
+                        Line activeLine = new Line();
+
+                        activeLine.X1 = Canvas.GetLeft(selectedRectangleToConnectOne);
+                        activeLine.Y1 = Canvas.GetTop(selectedRectangleToConnectOne);
+
+                        activeLine.X2 = Canvas.GetLeft(selectedRectangleToConnectTwo);
+                        activeLine.Y2 = Canvas.GetTop(selectedRectangleToConnectTwo);
+
+                        //making new edge and putting it in the dictionary
+                        linesOnCanvas.Add(activeLine, new Edge());
+
+
+
+
+
+                    }
+                    
+
+
 
                 }
             }
@@ -130,7 +201,7 @@ namespace storyGraphs
 
 
             }
-            if (e.OriginalSource is Line)
+            else if (e.OriginalSource is Line)
             {
                 //making it the selected line and edge
                 Line activeLine = (Line)e.OriginalSource;
@@ -192,15 +263,15 @@ namespace storyGraphs
         private void OnEdgeModeClick(object sender, RoutedEventArgs e)
         {
             //putting us in 
-            nodeMode = true;
-            edgeMode = false;
+            nodeMode = false;
+            edgeMode = true;
         }
 
         //when the node mode button is clicked
         private void OnNodeModeClick(object sender, RoutedEventArgs e)
         {
-            nodeMode = false;
-            edgeMode = true;
+            nodeMode = true;
+            edgeMode = false;
         }
     }
 
@@ -225,7 +296,23 @@ namespace storyGraphs
     //edge class
     public class Edge
     {
-        int edgeDegree;
+
+        //the nodes that this line connects
+        Node node1;
+        Node node2;
+
+        //CONSTRUCTORS
+        Edge()
+        {
+            node1 = new Node();
+            node2 = new Node();
+        }
+
+        Edge(Node n1, Node n2)
+        {
+            node1 = n1;
+            node2 = n2;
+        }
     }
 
 
