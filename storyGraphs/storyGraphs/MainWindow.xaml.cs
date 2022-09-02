@@ -187,7 +187,12 @@ namespace storyGraphs
 
                     NodesEdgesCanvas.Children.Remove(activeLine);
 
+                    linesOnCanvas[activeLine].node1.linesToEdgesDictionary.Remove(activeLine);
+                    linesOnCanvas[activeLine].node2.linesToEdgesDictionary.Remove(activeLine);
+
                     linesOnCanvas.Remove(activeLine);
+                    
+
 
                 }
             }
@@ -272,8 +277,8 @@ namespace storyGraphs
 
 
 
-                    //updating the location of the edges/lines
-                    foreach (KeyValuePair<Line, Edge> entry in linesOnCanvas)
+                    //updating the location of the edges/lines that are attached to the nodde we are dragging
+                    foreach (KeyValuePair<Line, Edge> entry in rectanglesOnCanvas[activeRec].linesToEdgesDictionary)
                     {
                         entry.Key.X1 = Canvas.GetLeft(entry.Value.rect1);
                         entry.Key.X2 = Canvas.GetLeft(entry.Value.rect2);
@@ -319,7 +324,9 @@ namespace storyGraphs
         //. Could be used as a label.
         private string content;
 
-        private Dictionary<Line, Edge> edgesDictionary = new Dictionary<Line, Edge>();
+        //dictionaries for going back and forth between lines and vice versa
+        public Dictionary<Line, Edge> linesToEdgesDictionary = new Dictionary<Line, Edge>();
+        //public Dictionary<Line, Edge> edgesToLinesDictionary = new Dictionary<Line, Edge>();
 
         public Node()
         { 
@@ -328,7 +335,9 @@ namespace storyGraphs
 
         public void addEdge(Line l,Edge e)
         {
-            edgesDictionary.Add(l, e);
+
+            linesToEdgesDictionary.Add(l, e);
+            //edgesToLinesDictionary.Add(e, l);
         }
 
 
