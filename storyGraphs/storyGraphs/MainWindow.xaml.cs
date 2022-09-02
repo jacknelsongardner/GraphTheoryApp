@@ -28,8 +28,19 @@ namespace storyGraphs
         //whether the mouse is being dragged
         bool mouseDragging;
 
+        //whether we are in edge mode or node mode
+        bool edgeMode;
+        bool nodeMode;
+
+
         Brush StandardBrush;
         Random r = new Random();
+
+        //variables for storing selected rectangle, node, etc
+        Node selectedNode = new Node();
+        Edge selectedEdge = new Edge();
+        Rectangle selectedRectangle = new Rectangle();
+        Line selectedLine = new Line();
 
         //for incrementing the ID we give in the dictionary
         //int nextRectangleId = 0;
@@ -44,12 +55,6 @@ namespace storyGraphs
         
 
 
-        /*
-        LinkedList<Node> nodesOnCanvas = new LinkedList<Node>();
-        LinkedList<Edge> edgesOnCanvas = new LinkedList<Edge>();
-        */
-
-
 
 
 
@@ -59,7 +64,8 @@ namespace storyGraphs
         //when the user clicks with the RIGHT mousebutton on the Graph/Node canvas
         private void MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
+            if (nodeMode == true)
+            {
                 // If we're clicking on a rectangle
                 if (e.OriginalSource is Rectangle)
                 {
@@ -67,7 +73,7 @@ namespace storyGraphs
                     Rectangle activeRec = (Rectangle)e.OriginalSource;
                     NodesEdgesCanvas.Children.Remove(activeRec); // find the rectangle and remove it from the canvas
                     rectanglesOnCanvas.Remove(activeRec);
-                    
+
 
 
                 }
@@ -75,7 +81,7 @@ namespace storyGraphs
                 // If we clicked on the canvas 
                 else
                 {
-                    
+
                     StandardBrush = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255),
                     (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
 
@@ -89,8 +95,8 @@ namespace storyGraphs
                         Stroke = Brushes.Black
                     };
 
-                    rectanglesOnCanvas.Add(newRec,new Node());
-                    
+                    rectanglesOnCanvas.Add(newRec, new Node());
+
 
                     //getting mouse x and y for rectangle placement
                     Canvas.SetLeft(newRec, Mouse.GetPosition(NodesEdgesCanvas).X); // set the left position of rectangle to mouse X
@@ -98,7 +104,7 @@ namespace storyGraphs
 
                     NodesEdgesCanvas.Children.Add(newRec); // add the new rectangle to the canvas
 
-
+                }
             }
 
         }
@@ -110,15 +116,32 @@ namespace storyGraphs
             // If we're clicking on a rectangle
             if (e.OriginalSource is Rectangle)
             {
-                //deleting the rectangle
+                //making it the selected rectangle and node
                 Rectangle activeRec = (Rectangle)e.OriginalSource;
+
+                selectedRectangle = activeRec;
+                selectedNode = rectanglesOnCanvas[activeRec];
+                selectedLine = new Line();
+                selectedEdge = new Edge();
+
+                //grabbing the node to drag
                 mouseDragging = true;
                 activeRec.CaptureMouse();
 
 
             }
+            if (e.OriginalSource is Line)
+            {
+                //making it the selected line and edge
+                Line activeLine = (Line)e.OriginalSource;
+
+                selectedRectangle = new Rectangle();
+                selectedNode = new Node();
+                selectedLine = activeLine;
+                selectedEdge = linesOnCanvas[activeLine];
 
 
+            }
         }
 
         //when the user clicks with the LEFT mousebutton on the GRAPHNode canvas
@@ -127,7 +150,8 @@ namespace storyGraphs
             // If we're clicking on a rectangle
             if (e.OriginalSource is Rectangle)
             {
-                //deleting the rectangle
+                
+                //releasing the krakken!...er, the rectangle
                 Rectangle activeRec = (Rectangle)e.OriginalSource;
                 mouseDragging = false;
                 activeRec.ReleaseMouseCapture();
@@ -149,6 +173,8 @@ namespace storyGraphs
                 {
                     Rectangle activeRec = (Rectangle)e.OriginalSource;
 
+
+
                     // get the position of the mouse relative to the Canvas
                     var mousePos = e.GetPosition(NodesEdgesCanvas);
 
@@ -162,17 +188,41 @@ namespace storyGraphs
             }
         }
 
+        //when the edge mode button is clicked
+        private void OnEdgeModeClick(object sender, RoutedEventArgs e)
+        {
+            //putting us in 
+            nodeMode = true;
+            edgeMode = false;
+        }
 
+        //when the node mode button is clicked
+        private void OnNodeModeClick(object sender, RoutedEventArgs e)
+        {
+            nodeMode = false;
+            edgeMode = true;
+        }
     }
 
+
+
+    //CLASSES (later to be put in another text file, for organization purposes)
+
+    //node class
     public class Node
     {
+        //how many edges are connected to the node
         int nodeDegree;
-        
+
+        //. Could be used as a label.
+        string content;
+
+
 
 
     }
 
+    //edge class
     public class Edge
     {
         int edgeDegree;
