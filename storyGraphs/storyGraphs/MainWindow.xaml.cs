@@ -167,6 +167,11 @@ namespace storyGraphs
                         linesOnCanvas.Add(activeLine, new Edge(selectedNodeToConnectOne, selectedNodeToConnectTwo));
                         NodesEdgesCanvas.Children.Add(activeLine);
 
+                        //adding the edge/line to the selected nodes
+                        selectedNodeToConnectOne.addEdge(activeLine,linesOnCanvas[activeLine]);
+                        selectedNodeToConnectTwo.addEdge(activeLine,linesOnCanvas[activeLine]);
+
+                        //reset clickcounter
                         clickCounter = 0;
 
                     }
@@ -264,6 +269,11 @@ namespace storyGraphs
                     double top = mousePos.Y - (activeRec.ActualHeight / 2);
                     Canvas.SetLeft(activeRec, left);
                     Canvas.SetTop(activeRec, top);
+
+
+
+                    //updating the location of the edges/lines
+
 
                     
                 }
