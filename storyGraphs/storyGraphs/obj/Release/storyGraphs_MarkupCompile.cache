@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\Jack Gardner\Source\Repos\storyGraphsNewVer\storyGraphs\storyGraphs\obj\Debug\
+C:\Users\Jack Gardner\Source\Repos\storyGraphsNewVer\storyGraphs\storyGraphs\obj\Release\
 storyGraphs
 none
 false
-DEBUG;TRACE
+TRACE
 C:\Users\Jack Gardner\Source\Repos\storyGraphsNewVer\storyGraphs\storyGraphs\App.xaml
 11151548125
 
-9-241600175
+8600759192
 13-1505183044
 MainWindow.xaml;
 
-False
+True
 

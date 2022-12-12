@@ -8,21 +8,21 @@
         Title="MainWindow" Height="500" Width="800" FocusManager.FocusedElement="{Binding ElementName=NodesEdgesCanvas}">
     <Grid>
 
-        
+
         <GridSplitter Height="469" Canvas.Left="568" Canvas.Top="2" Width="5"/>
         <Grid HorizontalAlignment="Right" Height="472" Margin="573,0,0,0" Width="222">
-            
-            <RichTextBox Margin="0,0,10,10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="426" />
-            
+
+            <RichTextBox Margin="0,0,10,158" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="278" />
+
             <Button x:Name="nodeButton" Content="node" HorizontalAlignment="Right" Margin="0,2,4,0" VerticalAlignment="Top" Width="38" Click="OnNodeModeClick"/>
             <Button x:Name="edgeButton" Content="edge" HorizontalAlignment="Right" Margin="0,2,47,0" VerticalAlignment="Top" Width="38" Click="OnEdgeModeClick"/>
 
         </Grid>
         <Canvas Name="NodesEdgesCanvas" Focusable="True" MouseMove="MouseMove" MouseLeftButtonUp="MouseLeftButtonUp" MouseLeftButtonDown="MouseLeftButtonDown" MouseRightButtonDown="MouseRightButtonDown" Background="Gray" Margin="0,0,227,0.5">
-            
-            
+
+
         </Canvas>
-        
+
     </Grid>
 
 

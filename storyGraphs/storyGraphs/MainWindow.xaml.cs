@@ -13,7 +13,7 @@ namespace storyGraphs
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        Object selectedObject = new Object();
 
         //whether the mouse is being dragged
         bool mouseDragging;
@@ -38,7 +38,6 @@ namespace storyGraphs
         LinkedList<Node> nodeHistory = new LinkedList<Node>();
         LinkedList<Rectangle> rectangleHistory = new LinkedList<Rectangle>();
 
-
         //nodes and rectangles that are selected to be connected
         Node selectedNodeToConnectOne = new Node();
         Node selectedNodeToConnectTwo = new Node();
@@ -49,21 +48,18 @@ namespace storyGraphs
         //how many times the user has clicked on nodes to connect them
         int clickCounter = 0;
 
-
-
-
-        //for incrementing the ID we give in the dictionary
-        //int nextRectangleId = 0;
-
-
-
-
         //dictionary for storing all the rectangles, so they can be called and deleted later on
-        Dictionary<Rectangle, Node> rectanglesOnCanvas = new Dictionary<Rectangle, Node>();
-        Dictionary<Line, Edge> linesOnCanvas = new Dictionary<Line, Edge>();
+        Dictionary<Rectangle, Node> rectanglesToNodes = new Dictionary<Rectangle, Node>();
+        Dictionary<Line, Edge> linesToEdges = new Dictionary<Line, Edge>();
 
+        Dictionary<Node, Rectangle> nodesToRectangles = new Dictionary<Node, Rectangle>();
+        Dictionary<Edge, Line> edgesToLines = new Dictionary<Edge, Line>();
 
+        List<Rectangle> rectanglesOnCanvas = new List<Rectangle>();
+        List<Line> linesOnCanvas = new List<Line>();
 
+        List<Node> nodesOnCanvas = new List<Node>();
+        List<Edge> edgesOnCanvas = new List<Edge>();
 
         public MainWindow()
         {
@@ -71,8 +67,6 @@ namespace storyGraphs
             nodeMode = true;
             edgeMode = false;
         }
-
-
 
         //WPF EVENTS
 
@@ -84,10 +78,29 @@ namespace storyGraphs
                 // If we're clicking on a rectangle
                 if (e.OriginalSource is Rectangle)
                 {
-                    //deleting the rectangle
                     Rectangle activeRec = (Rectangle)e.OriginalSource;
+                    Node activeNode = rectanglesToNodes[activeRec];
+
+                    //deleting all lines and edges connected to rectangle
+                    foreach(Edge elem in activeNode.edges)
+                    {
+                        NodesEdgesCanvas.Children.Remove(edgesToLines[elem]);
+                        edgesOnCanvas.Remove(elem);
+
+                        linesToEdges.Remove(edgesToLines[elem]);
+                        edgesToLines.Remove(elem);
+                    }
+
+                    //deleting the rectangle itself
+                    activeNode.deleteAllEdges();
+
                     NodesEdgesCanvas.Children.Remove(activeRec); // find the rectangle and remove it from the canvas
+                    
+                    rectanglesToNodes.Remove(activeRec);
+                    nodesToRectangles.Remove(activeNode);
+                    
                     rectanglesOnCanvas.Remove(activeRec);
+                    nodesOnCanvas.Remove(activeNode);
 
                 }
                 // Else if we clicked on the canvas 
@@ -95,8 +108,7 @@ namespace storyGraphs
                 {
                     //creating the new rectangle
 
-                    StandardBrush = new SolidColorBrush(Color.FromRgb((byte)r.Next(1, 255),
-                    (byte)r.Next(1, 255), (byte)r.Next(1, 233)));
+                    StandardBrush = new SolidColorBrush(Colors.Blue);
 
                     //creating new rectangle
                     Rectangle newRec = new Rectangle
@@ -108,8 +120,13 @@ namespace storyGraphs
                         Stroke = Brushes.Black
                     };
 
-                    rectanglesOnCanvas.Add(newRec, new Node());
+                    Node newNode = new Node();
 
+                    rectanglesToNodes.Add(newRec, newNode);
+                    nodesToRectangles.Add(newNode, newRec);
+
+                    rectanglesOnCanvas.Add(newRec);
+                    nodesOnCanvas.Add(newNode);
 
                     //getting mouse x and y for rectangle placement
                     Canvas.SetLeft(newRec, Mouse.GetPosition(NodesEdgesCanvas).X); // set the left position of rectangle to mouse X
@@ -125,11 +142,12 @@ namespace storyGraphs
                 if (e.OriginalSource is Rectangle)
                 {
                     Rectangle activeRec = (Rectangle)e.OriginalSource;
+                    Node activeNode = rectanglesToNodes[activeRec];
 
                     if (clickCounter == 0)
                     {
                         //setting the first node to connect
-                        selectedNodeToConnectOne = rectanglesOnCanvas[activeRec];
+                        selectedNodeToConnectOne = activeNode;
                         selectedRectangleToConnectOne = activeRec;
 
                         //adding one to click counter
@@ -139,10 +157,8 @@ namespace storyGraphs
                     else if (clickCounter == 1)
                     {
                         //setting the first node to connect
-                        selectedNodeToConnectTwo = rectanglesOnCanvas[activeRec];
+                        selectedNodeToConnectTwo = activeNode;
                         selectedRectangleToConnectTwo = activeRec;
-
-
 
                         //make a line connecting the two
                         Line activeLine = new Line();
@@ -158,42 +174,44 @@ namespace storyGraphs
                         SolidColorBrush lineBrush = new SolidColorBrush();
                         lineBrush.Color = Colors.Red;
 
-
                         activeLine.StrokeThickness = 4;
                         activeLine.Stroke = lineBrush;
 
+                        Edge activeEdge = new Edge(selectedNodeToConnectOne, selectedNodeToConnectTwo);
 
                         //making new edge and putting it in the dictionary
-                        linesOnCanvas.Add(activeLine, new Edge(selectedNodeToConnectOne, selectedNodeToConnectTwo, selectedRectangleToConnectOne, selectedRectangleToConnectTwo));
+                        linesToEdges.Add(activeLine, activeEdge);
+                        edgesToLines.Add(activeEdge, activeLine);
+
+                        edgesOnCanvas.Add(activeEdge);
+                        linesOnCanvas.Add(activeLine);
+
                         NodesEdgesCanvas.Children.Add(activeLine);
 
                         //adding the edge/line to the selected nodes
-                        selectedNodeToConnectOne.addEdge(activeLine,linesOnCanvas[activeLine]);
-                        selectedNodeToConnectTwo.addEdge(activeLine,linesOnCanvas[activeLine]);
+                        selectedNodeToConnectOne.addEdge(activeEdge);
+                        selectedNodeToConnectTwo.addEdge(activeEdge);
 
                         //reset clickcounter
                         clickCounter = 0;
-
                     }
-
-
-
-
                 }
                 else if (e.OriginalSource is Line)
                 {
                     //delete the line and the attached node
                     Line activeLine = (Line)e.OriginalSource;
+                    Edge activeEdge = linesToEdges[activeLine];
 
+                    //remove visual representation of the line
                     NodesEdgesCanvas.Children.Remove(activeLine);
 
-                    linesOnCanvas[activeLine].node1.linesToEdgesDictionary.Remove(activeLine);
-                    linesOnCanvas[activeLine].node2.linesToEdgesDictionary.Remove(activeLine);
+                    linesToEdges[activeLine].deleteSelfFromNodes();
 
+                    // removing all edges/lines permanently
+                    linesToEdges.Remove(activeLine);
+                    edgesToLines.Remove(activeEdge);
+                    edgesOnCanvas.Remove(activeEdge);
                     linesOnCanvas.Remove(activeLine);
-                    
-
-
                 }
             }
 
@@ -210,17 +228,14 @@ namespace storyGraphs
                 Rectangle activeRec = (Rectangle)e.OriginalSource;
 
                 selectedRectangle = activeRec;
-                selectedNode = rectanglesOnCanvas[activeRec];
+                selectedNode = rectanglesToNodes[activeRec];
                 selectedLine = new Line();
                 selectedEdge = new Edge();
 
                 //grabbing the node to drag
                 mouseDragging = true;
                 activeRec.CaptureMouse();
-
-
             }
-
             else if (e.OriginalSource is Line)
             {
                 //making it the selected line and edge
@@ -229,7 +244,7 @@ namespace storyGraphs
                 selectedRectangle = new Rectangle();
                 selectedNode = new Node();
                 selectedLine = activeLine;
-                selectedEdge = linesOnCanvas[activeLine];
+                selectedEdge = linesToEdges[activeLine];
 
 
             }
@@ -244,12 +259,11 @@ namespace storyGraphs
 
                 //releasing the krakken!...er, the rectangle
                 Rectangle activeRec = (Rectangle)e.OriginalSource;
+                Node activeNode = rectanglesToNodes[activeRec];
+                
                 mouseDragging = false;
                 activeRec.ReleaseMouseCapture();
-
-
             }
-
         }
 
         //when the users mouse moves
@@ -265,6 +279,7 @@ namespace storyGraphs
                 {
                     //the rectangle we're dealing with
                     Rectangle activeRec = (Rectangle)e.OriginalSource;
+                    Node activeNode = rectanglesToNodes[activeRec];
 
                     // get the position of the mouse relative to the Canvas
                     var mousePos = e.GetPosition(NodesEdgesCanvas);
@@ -275,19 +290,15 @@ namespace storyGraphs
                     Canvas.SetLeft(activeRec, left);
                     Canvas.SetTop(activeRec, top);
 
-
-
-                    //updating the location of the edges/lines that are attached to the nodde we are dragging
-                    foreach (KeyValuePair<Line, Edge> entry in rectanglesOnCanvas[activeRec].linesToEdgesDictionary)
-                    {
-                        entry.Key.X1 = Canvas.GetLeft(entry.Value.rect1);
-                        entry.Key.X2 = Canvas.GetLeft(entry.Value.rect2);
-                        entry.Key.Y1 = Canvas.GetTop(entry.Value.rect1);
-                        entry.Key.Y2 = Canvas.GetTop(entry.Value.rect2);
-
-                    }
-
                     
+                    //updating the location of the edges/lines that are attached to the nodde we are dragging
+                    foreach (Edge edge in activeNode.edges)
+                    {
+                        edgesToLines[edge].X1 = Canvas.GetLeft(nodesToRectangles[edge.nodeOne]);
+                        edgesToLines[edge].X2 = Canvas.GetLeft(nodesToRectangles[edge.nodeTwo]);
+                        edgesToLines[edge].Y1 = Canvas.GetTop(nodesToRectangles[edge.nodeOne]);
+                        edgesToLines[edge].Y2 = Canvas.GetTop(nodesToRectangles[edge.nodeTwo]);
+                    }
                 }
             }
         }
@@ -310,50 +321,100 @@ namespace storyGraphs
 
 
     }
-
-
-
+    
     //CLASSES (later to be put in another text file, for organization purposes)
 
     //node class
     public class Node
     {
-        //how many edges are connected to the node
-        private int nodeDegree;
 
-        //. Could be used as a label.
-        private string content;
+        public int nodeDegree;
+        public int ID;
+        public List<Edge> edges;
 
-        //dictionaries for going back and forth between lines and vice versa
-        public Dictionary<Line, Edge> linesToEdgesDictionary = new Dictionary<Line, Edge>();
-        //public Dictionary<Line, Edge> edgesToLinesDictionary = new Dictionary<Line, Edge>();
+        public int nodeX;
+        public int nodeY;
+
+        public string label;
+        public string content;
+
+        public float r;
+        public float g;
+        public float b;
 
         public Node()
-        { 
-            //do nothing for now :/
-        }
-
-        public void addEdge(Line l,Edge e)
         {
-
-            linesToEdgesDictionary.Add(l, e);
-            //edgesToLinesDictionary.Add(e, l);
+            edges = new List<Edge>();
+        }
+         
+        public Node(int id, int x, int y)
+        {
+            ID = id;
+            nodeDegree = 0;
+            edges = new List<Edge>();
+            updateXY(x, y);
         }
 
+        public void addEdge(Edge e)
+        {
+            edges.Add(e);
+            addDegree();
+        }
 
+        public void updateXY(int x, int y)
+        {
+            this.nodeX = x;
+            this.nodeY = y;
+        }
 
+        public void removeEdgeReference(Edge e)
+        {
+            edges.Remove(e);
+        }
+
+        public void deleteAllEdges()
+        {
+            foreach (Edge elem in edges.ToArray())
+            {
+                elem.deleteSelfFromNodes();
+                edges.Remove(elem);
+            }
+        }
+
+        public void addDegree()
+        {
+            this.nodeDegree++;
+        }
+
+        public void minusDegree()
+        {
+            this.nodeDegree--;
+        }
+
+        public void incrementID()
+        {
+            ID++;
+        }
     }
 
     //edge class
     public class Edge
     {
-
+        
         //the nodes that this line connects
-        public Node node1;
-        public Node node2;
+        public Node nodeOne;
+        public Node nodeTwo;
 
-        public Rectangle rect1;
-        public Rectangle rect2;
+        public int node1EndX;
+        public int node1EndY;
+        public int node2EndX;
+        public int node2EndY;
+
+        public string label;
+
+        public float r;
+        public float g;
+        public float b;
 
         //CONSTRUCTORS
         public Edge()
@@ -361,16 +422,34 @@ namespace storyGraphs
 
         }
 
-        public Edge(Node n1, Node n2, Rectangle r1, Rectangle r2)
+        public Edge(Node n1, Node n2)
         {
-            node1 = n1;
-            node2 = n2;
-            rect1 = r1;
-            rect2 = r2;
-
+            nodeOne = n1;
+            nodeTwo = n2;
+            updateXY();
         }
 
+        public void setNode(Node n1, Node n2)
+        {
+            nodeOne = n1;
+            nodeTwo = n2;
+            updateXY();
+        }
 
+        public void deleteSelfFromNodes()
+        {
+            nodeOne.removeEdgeReference(this);
+            nodeTwo.removeEdgeReference(this);
+        }
+
+        public void updateXY()
+        {
+            node1EndX = nodeOne.nodeX;
+            node1EndY = nodeOne.nodeY;
+
+            node2EndX = nodeTwo.nodeX;
+            node2EndY = nodeTwo.nodeY;
+        }
     }
 
 
